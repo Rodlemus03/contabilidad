@@ -1,8 +1,8 @@
-from operator import truediv
 import pandas
 from tkinter import messagebox
 from tkinter import filedialog as fd
 import os
+from openpyxl.workbook import Workbook
 
 
 
@@ -11,17 +11,24 @@ class principal:
     #Variables globales
         self.listaUtiles=[]
         self.menu()
-  
+    def formatearFecha(self,cadena):
+        cadenaNueva=""
+        for i in range(len(cadena)):
+            if i<10:
+                cadenaNueva+=cadena[i]
+        return cadenaNueva
     def abrir(self):
-        try:
-            archivo=fd.askopenfilename(title="Abrir un archivo")
-            abierto=open(archivo,'r',encoding='UTF-8')
-            self.df=pandas.read_csv(abierto,index_col=False)
-            self.bandera=True
+        #try:
+        archivo=fd.askopenfilename(title="Abrir un archivo")
+        abierto=open(archivo,'r',encoding='UTF-8')
+        self.df=pandas.read_csv(abierto,index_col=False)
 
-        except:
-            print("Ocurrio un error")
-    def depurar(self):
+        self.bandera=True
+
+        #except:
+        #    print("Ocurrio un error")
+       
+    def depurar(self,nombre):
         titulos=self.df.columns.values
         contador=1
         for i in titulos:
@@ -41,6 +48,10 @@ class principal:
             else:
                 print("Elige una opcion correcta ")
         self.dfNuevo=self.df[list(set(self.listaUtiles))]
+        #El siguiente paso es formatear la fecha para que se vea agradable
+        #self.dfNuevo['Fecha de emisi�n'].apply(self.formatearFecha)
+        n=nombre+".xlsx"
+        self.dfNuevo.to_excel(n,index=False)
             
 
     def mostrarDatos(self):
@@ -57,7 +68,7 @@ class principal:
         while(respuesta!=5):
             print("\n\n1. Abrir csv")
             print("2. Depurar")
-            print("3. Mostrar datos")
+            print("3. Mostrar datos y exportar")
             print("4. Hacer calculos")
             print("5. Salir")
             respuesta=int(input("Selecciona la opcion--->"))
@@ -66,14 +77,15 @@ class principal:
                 banderaAbrir=True
             elif respuesta==2:
                 if banderaAbrir:
-                    self.depurar()
+                    nombre=str(input("Ingresa el nombre con el que quieres que se guarde el archivo de excel depurado----->"))
+                    self.depurar(nombre)
                     banderaDepurar=True
                 else:
                     print("Debes de abrir primero")
             elif respuesta==3:
                 if banderaAbrir and banderaDepurar:
                     self.mostrarDatos()
-                    
+
                 else:
                     print("Debes de abrir primero")
             elif respuesta==4:
